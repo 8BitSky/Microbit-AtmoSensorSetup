@@ -1,0 +1,46 @@
+//The following code snippet should be pushed to the primary device hooked up to the LTS sensor
+
+let DataStream = ""
+
+//Display stored sensor readings on LEDs 
+input.onButtonPressed(Button.A, function () {
+    basic.showString(DataStream)
+})
+
+//Broadcast stored sensor readings over radio
+function sendData() {
+    radio.sendString(DataStream)
+}
+
+//User ability to broadcast stored sensor readings
+input.onButtonPressed(Button.B, function () {
+    sendData()
+})
+
+//Read and concatenate sensor data into a single string
+function readData() {
+    DataStream = "-" + COZIR.Co2() + "PPM" + "-" + Math.round(COZIR.temperature()) + "C" + "-" + Math.round(COZIR.relativeHumidity()) + "RH"
+}
+
+//Respond to data request for stored sensor readings
+radio.onReceivedNumber(function (receivedNumber) {
+    if (receivedNumber == 1) {
+        sendData()
+    }
+})
+
+//Serial settings for sensor board
+serial.redirect(
+SerialPin.P0,
+SerialPin.P1,
+BaudRate.BaudRate9600
+)
+
+//Set primary radio group for communication between braodcaster and listener devices
+radio.setGroup(1)
+
+//Store sensor data every 5 seconds - limits power draw, minimizes heat on board
+basic.forever(function () {
+    basic.pause(5000)
+    readData()
+})

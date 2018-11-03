@@ -1,0 +1,16 @@
+//The following code snippet creates a listening device. 
+//Push to multiple microbits to allow for many recievers within the classroom.
+
+//
+radio.onReceivedString(function (DataStream) {
+    basic.showString(DataStream)
+})
+
+//Push A button to send data query request to primary device with sensors.
+//Primary devices evaluates the message and sends string value back for display purposes. 
+input.onButtonPressed(Button.A, function () {
+    radio.sendNumber(1)
+})
+
+//Set the main radio group
+radio.setGroup(1)
